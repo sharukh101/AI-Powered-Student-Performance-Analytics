@@ -240,10 +240,11 @@ if __name__ == '__main__':
     def open_browser():
         webbrowser.open("http://127.0.0.1:5000")
 
-    # Open browser automatically on startup (only once, handling Werkzeug reloader)
-    if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-        Timer(1.2, open_browser).start()
-    elif not app.debug:
-        Timer(1.2, open_browser).start()
+    # Open browser automatically on startup (only once, handling Werkzeug reloader, and only if not running on Render)
+    if not os.environ.get("RENDER"):
+        if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+            Timer(1.2, open_browser).start()
+        elif not app.debug:
+            Timer(1.2, open_browser).start()
 
     app.run(debug=True, port=5000)
