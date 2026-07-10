@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Student Performance Analytics Dashboard</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="glow-bg"></div>
+    <div class="dashboard-container">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <i class="fa-solid fa-graduation-cap brand-icon"></i>
+                <h2>EduPredict<span>.ai</span></h2>
+            </div>
+            <nav class="nav-menu">
+                <a href="#overview" class="nav-item active"><i class="fa-solid fa-chart-pie"></i> Overview</a>
+                <a href="#predictions" class="nav-item"><i class="fa-solid fa-brain"></i> ML Predictions</a>
+                <a href="#sql-queries" class="nav-item"><i class="fa-solid fa-database"></i> SQL Analysis</a>
+            </nav>
+            <div class="sidebar-footer">
+                <p>System Status</p>
+                <div class="status-indicator">
+                    <span class="dot pulse"></span>
+                    <span>Database Connected</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Dashboard Content -->
+        <main class="main-content">
+            <header class="dashboard-header">
+                <div>
+                    <h1>Student Performance Analytics</h1>
+                    <p class="subtitle">AI-Driven Attendance, Study Impact & Risk Modeling Dashboard</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="refreshDashboardData()">
+                        <i class="fa-solid fa-arrows-rotate"></i> Sync Data
+                    </button>
+                </div>
+            </header>
+
+            <!-- Metrics Cards Grid -->
+            <section id="overview" class="metrics-grid">
+                <div class="metric-card">
+                    <div class="card-body">
+                        <div class="metric-info">
+                            <span class="card-label">Total Cohort Size</span>
+                            <h3 id="stat-total-students" class="card-value">-</h3>
+                        </div>
+                        <div class="card-icon blue"><i class="fa-solid fa-users"></i></div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="trend positive"><i class="fa-solid fa-circle-check"></i> Loaded</span> Active enrolled students
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="card-body">
+                        <div class="metric-info">
+                            <span class="card-label">Avg Attendance</span>
+                            <h3 id="stat-avg-attendance" class="card-value">-%</h3>
+                        </div>
+                        <div class="card-icon emerald"><i class="fa-solid fa-calendar-check"></i></div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="trend positive"><i class="fa-solid fa-circle-up"></i> Target 80%+</span> Overall attendance average
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="card-body">
+                        <div class="metric-info">
+                            <span class="card-label">Avg Study Hours</span>
+                            <h3 id="stat-avg-study-hours" class="card-value">- hrs</h3>
+                        </div>
+                        <div class="card-icon purple"><i class="fa-solid fa-book-open"></i></div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="trend neutral"><i class="fa-solid fa-clock"></i> Weekly</span> Self-reported study hours
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="card-body">
+                        <div class="metric-info">
+                            <span class="card-label">Overall Pass Rate</span>
+                            <h3 id="stat-passing-rate" class="card-value">-%</h3>
+                        </div>
+                        <div class="card-icon amber"><i class="fa-solid fa-award"></i></div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="trend positive"><i class="fa-solid fa-arrow-trend-up"></i> High Accuracy</span> Final grade pass threshold (>= 50%)
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="dashboard-grid">
+                <!-- Main Scatter Plot / Line Chart -->
+                <div class="chart-container span-2">
+                    <div class="chart-header">
+                        <h3>Attendance & Study Hours Impact</h3>
+                        <div class="chart-toggle">
+                            <button id="btn-chart-scatter" class="toggle-btn active" onclick="switchChart('scatter')">Attendance vs Final Grade</button>
+                            <button id="btn-chart-line" class="toggle-btn" onclick="switchChart('line')">Study Hours Trend</button>
+                        </div>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="impactChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Risk Distribution Chart -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>AI Risk Assessment Distribution</h3>
+                    </div>
+                    <div class="chart-body pie-body">
+                        <canvas id="riskChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Predictions / Predictive Playground Section -->
+            <section id="predictions" class="interactive-section">
+                <div class="section-card">
+                    <div class="section-card-header">
+                        <h2><i class="fa-solid fa-wand-magic-sparkles gradient-icon"></i> AI Performance Prediction Playground</h2>
+                        <p>Simulate student inputs and get real-time Final Score and Failure Risk predictions from the Random Forest models.</p>
+                    </div>
+                    <div class="interactive-grid">
+                        <!-- Controls Form -->
+                        <div class="prediction-inputs">
+                            <div class="form-group">
+                                <label for="input-attendance">Attendance Rate (%) <span id="val-attendance" class="slider-val">85%</span></label>
+                                <input type="range" id="input-attendance" min="40" max="100" value="85" step="0.5" class="slider">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="input-study-hours">Study Hours / Week <span id="val-study-hours" class="slider-val">12.0 hrs</span></label>
+                                <input type="range" id="input-study-hours" min="1" max="30" value="12" step="0.5" class="slider">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="input-midterm">Midterm Score (/100) <span id="val-midterm" class="slider-val">75</span></label>
+                                <input type="range" id="input-midterm" min="20" max="100" value="75" step="1" class="slider">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="input-assignments">Assignment Completion Rate (%) <span id="val-assignments" class="slider-val">80%</span></label>
+                                <input type="range" id="input-assignments" min="10" max="100" value="80" step="1" class="slider">
+                            </div>
+
+                            <div class="form-row-2">
+                                <div class="form-group">
+                                    <label for="input-sleep">Sleep Hours / Day</label>
+                                    <input type="number" id="input-sleep" min="4" max="10" value="7.0" step="0.5" class="number-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="input-screen">Screen Time / Day (hrs)</label>
+                                    <input type="number" id="input-screen" min="1" max="12" value="4.5" step="0.5" class="number-input">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Prediction Outcome Display -->
+                        <div class="prediction-results">
+                            <div class="result-glass-card">
+                                <h4>Predicted Final Score</h4>
+                                <div id="predicted-score-display" class="metric-score">-</div>
+                                
+                                <div class="results-meta-grid">
+                                    <div class="meta-item">
+                                        <span class="meta-label">Pass Probability</span>
+                                        <span id="pass-probability-display" class="meta-val">-</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span class="meta-label">Risk Level</span>
+                                        <span id="risk-level-display" class="meta-val risk-badge">-</span>
+                                    </div>
+                                </div>
+
+                                <div class="risk-bar-container">
+                                    <div id="risk-bar-fill" class="risk-bar-fill" style="width: 0%"></div>
+                                </div>
+                                <p class="risk-desc" id="risk-description-text">Adjust sliders on the left to recalculate ML prediction metrics.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SQL Query Section -->
+            <section id="sql-queries" class="sql-section">
+                <div class="section-card">
+                    <div class="section-card-header">
+                        <h2><i class="fa-solid fa-code gradient-icon"></i> SQL Analytics Query Engine</h2>
+                        <p>Execute pre-written SQL analytical queries directly on the SQLite database to analyze historical patterns.</p>
+                    </div>
+
+                    <div class="sql-engine-grid">
+                        <div class="sql-selector">
+                            <div class="form-group">
+                                <label for="sql-query-select">Select Analytical Query:</label>
+                                <select id="sql-query-select" class="select-input" onchange="loadSqlQueryText()">
+                                    <option value="attendance_impact">Attendance Impact on Final Score</option>
+                                    <option value="study_hours_impact">Study Hours Correlation</option>
+                                    <option value="high_risk_students">Top 10 High-Risk Students (Intervention List)</option>
+                                    <option value="sleep_screen_impact">Sleep vs Screen Time Analysis</option>
+                                </select>
+                            </div>
+                            <div class="sql-code-display">
+                                <pre><code id="sql-query-code">-- Query code will appear here</code></pre>
+                            </div>
+                            <button class="btn btn-primary btn-full" onclick="executeSqlQuery()">
+                                <i class="fa-solid fa-play"></i> Run SQL Query
+                            </button>
+                        </div>
+
+                        <div class="sql-results-container">
+                            <div class="results-header">
+                                <span>Query Output</span>
+                                <span id="sql-rows-count" class="rows-badge">0 Rows</span>
+                            </div>
+                            <div class="table-scroll-container">
+                                <table id="sql-results-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Execute a query to see the results.</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>No data loaded yet. Select a query and click 'Run'.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Main JS logic -->
+    <script src="/static/dashboard.js"></script>
+</body>
+</html>
